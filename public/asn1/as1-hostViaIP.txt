@@ -1,0 +1,89 @@
+william@SchnapieMo:~$ ifconfig
+enp0s31f6 Link encap:Ethernet  HWaddr 2c:4d:54:9e:28:25  
+          inet addr:192.168.0.15  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::c6e8:3339:b16c:17be/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:3431 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:760 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:375385 (375.3 KB)  TX bytes:106407 (106.4 KB)
+          Interrupt:16 Memory:df200000-df220000 
+
+enx38d2696356e8 Link encap:Ethernet  HWaddr 38:d2:69:63:56:e8  
+          inet addr:192.168.7.1  Bcast:192.168.7.3  Mask:255.255.255.252
+          inet6 addr: fe80::662e:c010:ab7c:5b8f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:448 errors:3 dropped:0 overruns:0 frame:3
+          TX packets:705 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:53972 (53.9 KB)  TX bytes:99695 (99.6 KB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:368 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:368 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:30162 (30.1 KB)  TX bytes:30162 (30.1 KB)
+
+william@SchnapieMo:~$ ping 192.168.7.2
+PING 192.168.7.2 (192.168.7.2) 56(84) bytes of data.
+64 bytes from 192.168.7.2: icmp_seq=1 ttl=64 time=0.423 ms
+64 bytes from 192.168.7.2: icmp_seq=2 ttl=64 time=0.420 ms
+64 bytes from 192.168.7.2: icmp_seq=3 ttl=64 time=0.375 ms
+64 bytes from 192.168.7.2: icmp_seq=4 ttl=64 time=0.321 ms
+^C
+--- 192.168.7.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3055ms
+rtt min/avg/max/mdev = 0.321/0.384/0.423/0.047 ms
+william@SchnapieMo:~$ ssh root@192.168.0.100
+^C
+william@SchnapieMo:~$ ssh root@192.168.7.2
+Debian GNU/Linux 8
+
+BeagleBoard.org Debian Image 2016-05-13
+
+Support/FAQ: http://elinux.org/Beagleboard:BeagleBoneBlack_Debian
+
+default username:password is [debian:temppwd]
+
+Last login: Sun Sep 24 22:08:05 2017 from 192.168.7.1
+root@beaglebone:~# cd /proc
+root@beaglebone:/proc# ls
+1    191  299  401  54	 72   80	 consoles     ioports	   mounts	 sysrq-trigger
+10   196  3    408  55	 73   800	 cpu	      irq	   mtd		 sysvipc
+11   2	  30   424  56	 74   811	 cpuinfo      kallsyms	   net		 thread-self
+12   20   31   444  58	 75   813	 crypto       key-users    pagetypeinfo  timer_list
+132  21   313  445  59	 76   819	 device-tree  keys	   partitions	 timer_stats
+133  22   317  446  590  769  9		 devices      kmsg	   sched_debug	 tty
+14   23   32   447  6	 77   96	 diskstats    kpagecgroup  schedstat	 uptime
+15   24   321  450  60	 771  apm	 driver       kpagecount   scsi		 version
+16   25   336  498  61	 773  asound	 execdomains  kpageflags   self		 vmallocinfo
+164  26   340  5    7	 78   buddyinfo  fb	      loadavg	   slabinfo	 vmstat
+17   264  353  506  701  79   bus	 filesystems  locks	   softirqs	 zoneinfo
+176  27   373  508  704  790  cgroups	 fs	      meminfo	   stat
+18   28   375  527  705  792  cmdline	 interrupts   misc	   swaps
+19   29   4    534  71	 8    config.gz  iomem	      modules	   sys
+root@beaglebone:/proc# cat version
+Linux version 4.4.9-ti-r25 (root@b3-jetson-tk1-2gb) (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Thu May 5 23:08:13 UTC 2016
+root@beaglebone:/proc# cat uptime
+903.44 864.34
+root@beaglebone:/proc# cat cpuinfo
+processor	: 0
+model name	: ARMv7 Processor rev 2 (v7l)
+BogoMIPS	: 298.59
+Features	: half thumb fastmult vfp edsp thumbee neon vfpv3 tls vfpd32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x3
+CPU part	: 0xc08
+CPU revision	: 2
+
+Hardware	: Generic AM33XX (Flattened Device Tree)
+Revision	: 0000
+Serial		: 0000000000000000
+root@beaglebone:/proc# exit
+logout
+Connection to 192.168.7.2 closed.
+
