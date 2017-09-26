@@ -1,0 +1,3 @@
+sudo iptables --table nat --append POSTROUTING --out-interface enp0s31f6 -j MASQUERADE
+sudo iptables --append FORWARD --in-interface enx38d2696356e8 -j ACCEPT
+sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
