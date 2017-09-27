@@ -1,0 +1,54 @@
+root
+Last login: Wed Sep 27 11:00:14 UTC 2017 from 192.168.7.1 on pts/0
+Linux xza116-beagle 4.4.9-ti-r25 #1 SMP Thu May 5 23:08:13 UTC 2016 armv7l
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+
+Some of the words here are written by William Zhang the magnificent 
+self-proclaimed duke of a dukedom somewhere on the planet. Enough jokes...
+just to show I am capable of changing this message in /etc/motd
+Hello embedded world! from Xinran Zhang!
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 3 time(s): Joystick = 1 & counter = 1
+Flashing 3 time(s): Joystick = 1 & counter = 2
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 1 time(s): Joystick = 0 & counter = 0
+Flashing 3 time(s): Joystick = 1 & counter = 1
+Flashing 3 time(s): Joystick = 1 & counter = 2
+Flashing 3 time(s): Joystick = 1 & counter = 3
+Flashing 3 time(s): Joystick = 1 & counter = 4
+Flashing 3 time(s): Joystick = 1 & counter = 5
+Flashing 3 time(s): Joystick = 1 & counter = 6
+Flashing 3 time(s): Joystick = 1 & counter = 7
+Flashing 3 time(s): Joystick = 1 & counter = 8
+Flashing 3 time(s): Joystick = 1 & counter = 9
+Bye Bye embedded world!
+root@xza116-beagle:~# ./BBGinit
+-bash: ./BBGinit: Is a directory
+root@xza116-beagle:~# ls
+BBGinit  hello
+root@xza116-beagle:~# ./BBGini[K[K[K[K[K[K[K[Kcd ./[K[K[K[K[K./BBGINI[K[K[Kinit/mountNGS[K[KFS
+root@xza116-beagle:~# ls
+BBGinit  hello
+root@xza116-beagle:~# cd /mnt/remote
+root@xza116-beagle:/mnt/remote# ls
+asn1  BBGinit  issue  issue.net  issue.save  myApps  nano.save
+root@xza116-beagle:/mnt/remote# cd myApps
+root@xza116-beagle:/mnt/remote/myApps# ls
+hello
+root@xza116-beagle:/mnt/remote/myApps# A[K

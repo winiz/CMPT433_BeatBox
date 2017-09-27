@@ -1,0 +1,82 @@
+ifconfig
+eth0      Link encap:Ethernet  HWaddr 38:d2:69:63:56:e6  
+          UP BROADCAST MULTICAST DYNAMIC  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:175 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:4960 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:4960 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1 
+          RX bytes:382560 (373.5 KiB)  TX bytes:382560 (373.5 KiB)
+
+usb0      Link encap:Ethernet  HWaddr 38:d2:69:63:56:e0  
+          inet addr:192.168.7.2  Bcast:192.168.7.3  Mask:255.255.255.252
+          inet6 addr: fe80::3ad2:69ff:fe63:56e0/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:134 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:45 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:26445 (25.8 KiB)  TX bytes:13763 (13.4 KiB)
+
+root@beaglebone:~# ping 192.168.7.1
+PING 192.168.7.1 (192.168.7.1) 56(84) bytes of data.
+ From 192.168.7.2 icmp_seq=1 Destination Host Unreachable
+From 192.168.7.2 icmp_seq=2 Destination Host Unreachable
+From 192.168.7.2 icmp_seq=3 Destination Host Unreachable
+ ^C
+--- 192.168.7.1 ping statistics ---
+5 packets transmitted, 0 received, +3 errors, 100% packet loss, time 4024ms
+pipe 3
+root@beaglebone:~# 
+root@beaglebone:~# 
+root@beaglebone:~# 
+root@beaglebone:~# ping 192.168.7.1[K[K[K0.15
+connect: Network is unreachable
+root@beaglebone:~# ^C
+root@beaglebone:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 38:d2:69:63:56:e6  
+          UP BROADCAST MULTICAST DYNAMIC  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+          Interrupt:175 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:2088 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:2088 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1 
+          RX bytes:161440 (157.6 KiB)  TX bytes:161440 (157.6 KiB)
+
+usb0      Link encap:Ethernet  HWaddr 38:d2:69:63:56:e0  
+          inet addr:192.168.7.2  Bcast:192.168.7.3  Mask:255.255.255.252
+          inet6 addr: fe80::3ad2:69ff:fe63:56e0/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:81 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:73 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:10554 (10.3 KiB)  TX bytes:19401 (18.9 KiB)
+
+root@beaglebone:~# ping 192.168.7.2[K1
+PING 192.168.7.1 (192.168.7.1) 56(84) bytes of data.
+64 bytes from 192.168.7.1: icmp_seq=1 ttl=64 time=0.502 ms
+64 bytes from 192.168.7.1: icmp_seq=2 ttl=64 time=0.263 ms
+64 bytes from 192.168.7.1: icmp_seq=3 ttl=64 time=0.321 ms
+64 bytes from 192.168.7.1: icmp_seq=4 ttl=64 time=0.403 ms
+64 bytes from 192.168.7.1: icmp_seq=5 ttl=64 time=0.377 ms
+64 bytes from 192.168.7.1: icmp_seq=6 ttl=64 time=0.306 ms
+^C
+--- 192.168.7.1 ping statistics ---
+6 packets transmitted, 6 received, 0% packet loss, time 4999ms
+rtt min/avg/max/mdev = 0.263/0.362/0.502/0.077 ms
+root@beaglebone:~# 

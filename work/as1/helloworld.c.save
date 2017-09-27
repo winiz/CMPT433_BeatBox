@@ -1,6 +1,0 @@
-#include <stdio.h>
-int main(char* args[]) 
-{
-	pHello embedded world, from Brian Fraser!rintf("Hello embedded world!\n");
-	return 0;
-}
