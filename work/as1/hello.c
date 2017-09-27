@@ -16,6 +16,7 @@ Xinran Zhang 10:16AM 2017.9.26
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define GPIO_EXPORT_PATH "/sys/class/gpio/export"
 #define GPIO_NUMBER 26
@@ -24,6 +25,7 @@ Xinran Zhang 10:16AM 2017.9.26
 int readFromFile(char *fileName);
 void writeToFile(char *fileName, int gpioNum);
 _Bool checkIfPressedUp();
+void busyWait();
 
 
 int main(int argc, char* argv[])
@@ -47,6 +49,7 @@ int main(int argc, char* argv[])
 			counter = 0;
 		}
 		printf("Flashing 1 time(s): Joystick = %d & counter = %d\n", Joystick, counter);
+	busyWait();
 	}
 	printf("Bye Bye embedded world!\n");//Display ending message
 	return 0;
@@ -94,3 +97,9 @@ _Bool checkIfPressedUp(){
 		return 0;
 }
 
+void busyWait(){ //hard coded to 600 ms 
+	long seconds = 0;
+	long nanoseconds = 600000000;
+	struct timespec reqDelay = {seconds, nanoseconds};
+	nanosleep(&reqDelay, (struct timespec *) NULL);
+}
