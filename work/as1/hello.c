@@ -93,11 +93,12 @@ _Bool checkIfPressedUp(){
 	if (boo == 0){
 		return 1;
 	}
-	else
+	else {
 		return 0;
+	}
 }
 
-void busyWait(){ //hard coded to 600 ms 
+void busyWait(){ //hard coded to 600 ms which is 6e+8 according to duckduckgo
 	long seconds = 0;
 	long nanoseconds = 600000000;
 	struct timespec reqDelay = {seconds, nanoseconds};
