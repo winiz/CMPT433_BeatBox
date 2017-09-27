@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 			counter = 0;
 		}
 		printf("Flashing %d time(s): Joystick = %d & counter = %d\n", mode, Joystick, counter);
-	busyWait();
+		busyWait();
 	}
 	printf("Bye Bye embedded world!\n");//Display ending message
 	return 0;
@@ -129,12 +129,12 @@ int ledFlashing(int mode){
 	
 	//mode 3 simply means triple kills eh
 	else if (mode==3){
-		writeToFile(LED0_DELAYON_PATH, 100);
-		writeToFile(LED0_DELAYOFF_PATH, 100);
-		writeToFile(LED0_DELAYON_PATH, 100);
-		writeToFile(LED0_DELAYOFF_PATH, 100);
-		writeToFile(LED0_DELAYON_PATH, 100);
-		writeToFile(LED0_DELAYOFF_PATH, 100);
+		writeToFile(LED0_DELAYON_PATH, 30);
+		writeToFile(LED0_DELAYOFF_PATH, 30);
+		writeToFile(LED0_DELAYON_PATH, 30);
+		writeToFile(LED0_DELAYOFF_PATH, 30);
+		writeToFile(LED0_DELAYON_PATH, 30);
+		writeToFile(LED0_DELAYOFF_PATH, 30);
 	}
 	return mode;
 }
