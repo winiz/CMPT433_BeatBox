@@ -82,7 +82,7 @@ int readFromFile(char *fileName){
 }
 
 
-void writeToFile(char *fileName, int gpioNum){
+void writeToFile(char *fileName, int value){
 	FILE *pfile = fopen(fileName, "w");
 	if (pfile == NULL) {
 		printf("ERROR: Unable to open export file.\n");
@@ -90,7 +90,7 @@ void writeToFile(char *fileName, int gpioNum){
 	}
 
 	// Write to data to the file using fprintf():
-	fprintf(pfile, "%d", gpioNum);
+	fprintf(pfile, "%d", value);
 
 	// Close the file using fclose():
 	fclose(pfile);
@@ -117,7 +117,7 @@ int ledFlashing(int mode){
 	fprintf(pfile, "%s", "timer");
 	fclose(pfile);
 	
-	//mode 0 simply means for busywait 600ms 
+	//mode 0 is for busywait' 600ms 
 	if (mode==0){
 		writeToFile(LED0_DELAYOFF_PATH, 600);
 	}
@@ -129,12 +129,12 @@ int ledFlashing(int mode){
 	
 	//mode 3 simply means triple kills eh
 	else if (mode==3){
-		writeToFile(LED0_DELAYON_PATH, 30);
-		writeToFile(LED0_DELAYOFF_PATH, 30);
-		writeToFile(LED0_DELAYON_PATH, 30);
-		writeToFile(LED0_DELAYOFF_PATH, 30);
-		writeToFile(LED0_DELAYON_PATH, 30);
-		writeToFile(LED0_DELAYOFF_PATH, 30);
+		writeToFile(LED0_DELAYON_PATH, 100);
+		writeToFile(LED0_DELAYOFF_PATH, 100);
+		writeToFile(LED0_DELAYON_PATH, 100);
+		writeToFile(LED0_DELAYOFF_PATH, 100);
+		writeToFile(LED0_DELAYON_PATH, 100);
+		writeToFile(LED0_DELAYOFF_PATH, 100);
 	}
 	return mode;
 }
