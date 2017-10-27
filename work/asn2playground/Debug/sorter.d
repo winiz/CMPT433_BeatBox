@@ -1,1 +1,0 @@
-sorter.o: ../sorter.c
