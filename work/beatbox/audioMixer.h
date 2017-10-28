@@ -10,9 +10,9 @@ typedef struct {
 
 #define AUDIOMIXER_MAX_VOLUME 100
 
-#define SOURCE_FILE "beatbox-wave-files/100060__menegass__gui-drum-splash-hard.wav"
-//#define SOURCE_FILE "beatbox-wave-fileswave-files/100053__menegass__gui-drum-cc.wav"
-//#define SOURCE_FILE "beatbox-wave-files/100051__menegass__gui-drum-bd-hard"
+#define SOURCE_FILE_BASEDRUM "beatbox-wave-files/100051__menegass__gui-drum-bd-hard.wav"
+#define SOURCE_FILE_HIHAT "beatbox-wave-files/100053__menegass__gui-drum-cc.wav"
+#define SOURCE_FILE_SNARE "beatbox-wave-files/100059__menegass__gui-drum-snare-soft.wav"
 
 // init() must be called before any other functions,
 // cleanup() must be called last to stop playback threads and free memory.
@@ -33,5 +33,7 @@ void AudioMixer_queueSound(wavedata_t *pSound);
 // http://stackoverflow.com/questions/6787318/set-alsa-master-volume-from-c-code
 int  AudioMixer_getVolume();
 void AudioMixer_setVolume(int newVolume);
+
+void* playbackThread(void* arg);
 
 #endif
