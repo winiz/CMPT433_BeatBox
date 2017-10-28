@@ -143,11 +143,16 @@ void AudioMixer_queueSound(wavedata_t *pSound) {
 	 * REVISIT: Implement this:
 	 * 1. Since this may be called by other threads, and there is a thread
 	 *    processing the soundBites[] array, we must ensure access is threadsafe.
+	 * 2. Search through the soundBites[] array looking for a free slot.
+	 * 3. If a free slot is found, place the new sound file into that slot.
+	 *    Note: You are only copying a pointer, not the entire data of the wave file!
+	 * 4. After searching through all slots, if no free slot is found then print
+	 *    an error message to the console (and likely just return vs asserting/exiting
+	 *    because the application most likely doesn't want to crash just for
+	 *    not being able to play another wave file.
 	 */
-	pthread_mutex_lock(&audioMutex);
 
-	//  2. Search through the soundBites[] array looking for a free slot.
-	//	3. If a free slot is found, place the new sound file into that slot.
+	pthread_mutex_lock(&audioMutex);
 	for (int i = 0; i < MAX_SOUND_BITES; i++) {
 		if (soundBites[i].pSound == NULL) {
 			soundBites[i].pSound = pSound;
@@ -157,33 +162,23 @@ void AudioMixer_queueSound(wavedata_t *pSound) {
 			printf("no free slots is found in sondBites\n");
 		}
 	}
-
-	/*
-	 
-	 *    Note: You are only copying a pointer, not the entire data of the wave file!
-	 * 4. After searching through all slots, if no free slot is found then print
-	 *    an error message to the console (and likely just return vs asserting/exiting
-	 *    because the application most likely doesn't want to crash just for
-	 *    not being able to play another wave file.
-	 */
-
 	pthread_mutex_unlock(&audioMutex);
 }
 
 void AudioMixer_cleanup(void) {
 	printf("Stopping audio...\n");
 
-// Stop the PCM generation thread
+	// Stop the PCM generation thread
 	stopping = true;
 	pthread_join(playbackThreadId, NULL);
 
-// Shutdown the PCM output, allowing any pending sound to play out (drain)
+	// Shutdown the PCM output, allowing any pending sound to play out (drain)
 	snd_pcm_drain(handle);
 	snd_pcm_close(handle);
 
-// Free playback buffer
-// (note that any wave files read into wavedata_t records must be freed
-//  in addition to this by calling AudioMixer_freeWaveFileData() on that struct.)
+	// Free playback buffer
+	// (note that any wave files read into wavedata_t records must be freed
+	//  in addition to this by calling AudioMixer_freeWaveFileData() on that struct.)
 	free(playbackBuffer);
 	playbackBuffer = NULL;
 
@@ -192,8 +187,8 @@ void AudioMixer_cleanup(void) {
 }
 
 int AudioMixer_getVolume() {
-// Return the cached volume; good enough unless someone is changing
-// the volume through other means and the cached value is out of date.
+	// Return the cached volume; good enough unless someone is changing
+	// the volume through other means and the cached value is out of date.
 	return volume;
 }
 
@@ -201,7 +196,7 @@ int AudioMixer_getVolume() {
 // http://stackoverflow.com/questions/6787318/set-alsa-master-volume-from-c-code
 // Written by user "trenki".
 void AudioMixer_setVolume(int newVolume) {
-// Ensure volume is reasonable; If so, cache it for later getVolume() calls.
+	// Ensure volume is reasonable; If so, cache it for later getVolume() calls.
 	if (newVolume < 0 || newVolume > AUDIOMIXER_MAX_VOLUME) {
 		printf("ERROR: Volume must be between 0 and 100.\n");
 		return;
@@ -275,16 +270,14 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	 *
 	 */
 
-//1. Wipe the playbackBuffer to all 0's to clear any previous PCM data.
 	pthread_mutex_lock(&audioMutex);
-	memset(playbackBuffer, 0, playbackBufferSize*sizeof(*playbackBuffer));
-	
-	for (int i = 0 ; i < MAX_SOUND_BITES; i++) {
+	memset(playbackBuffer, 0, playbackBufferSize * sizeof(*playbackBuffer));
+
+	for (int i = 0; i < MAX_SOUND_BITES; i++) {
 		//playbackBuffer[i] = (soundBites[i].pSound)->pData;
 	}
-	
-	pthread_mutex_unlock(&audioMutex);
 
+	pthread_mutex_unlock(&audioMutex);
 }
 
 void* playbackThread(void* arg) {
