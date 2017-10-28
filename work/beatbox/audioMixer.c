@@ -1,13 +1,12 @@
 // Incomplete implementation of an audio mixer. Search for "REVISIT" to find things
 // which are left as incomplete.
 // Note: Generates low latency audio on BeagleBone Black; higher latency found on host.
-#include "audioMixer_template.h"
+#include "audioMixer.h"
 #include <alsa/asoundlib.h>
 #include <stdbool.h>
 #include <pthread.h>
 #include <limits.h>
 #include <alloca.h> // needed for mixer
-
 
 static snd_pcm_t *handle;
 
@@ -21,7 +20,6 @@ static snd_pcm_t *handle;
 
 static unsigned long playbackBufferSize = 0;
 static short *playbackBuffer = NULL;
-
 
 // Currently active (waiting to be played) sound bites
 #define MAX_SOUND_BITES 30
@@ -45,41 +43,41 @@ static pthread_mutex_t audioMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static int volume = 0;
 
-void AudioMixer_init(void)
-{
+void AudioMixer_init(void) {
 	AudioMixer_setVolume(DEFAULT_VOLUME);
 
 	// Initialize the currently active sound-bites being played
 	// REVISIT:- Implement this. Hint: set the pSound pointer to NULL for each
 	//     sound bite.
-
-
-
+	pthread_mutex_lock(&audioMutex);
+	int i;
+	for (i = 0; i < MAX_SOUND_BITES; i++) {
+		soundBites[i].pSound = NULL;
+	}
+	pthread_mutex_unlock(&audioMutex);
 
 	// Open the PCM output
 	int err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
 	if (err < 0) {
 		printf("Playback open error: %s\n", snd_strerror(err));
-		exit(EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 
 	// Configure parameters of PCM output
-	err = snd_pcm_set_params(handle,
-			SND_PCM_FORMAT_S16_LE,
+	err = snd_pcm_set_params(handle, SND_PCM_FORMAT_S16_LE,
 			SND_PCM_ACCESS_RW_INTERLEAVED,
 			NUM_CHANNELS,
-			SAMPLE_RATE,
-			1,			// Allow software resampling
+			SAMPLE_RATE, 1,			// Allow software resampling
 			50000);		// 0.05 seconds per buffer
 	if (err < 0) {
 		printf("Playback open error: %s\n", snd_strerror(err));
-		exit(EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 
 	// Allocate this software's playback buffer to be the same size as the
 	// the hardware's playback buffers for efficient data transfers.
 	// ..get info on the hardware buffers:
- 	unsigned long unusedBufferSize = 0;
+	unsigned long unusedBufferSize = 0;
 	snd_pcm_get_params(handle, &unusedBufferSize, &playbackBufferSize);
 	// ..allocate playback buffer:
 	playbackBuffer = malloc(playbackBufferSize * sizeof(*playbackBuffer));
@@ -88,10 +86,8 @@ void AudioMixer_init(void)
 	pthread_create(&playbackThreadId, NULL, playbackThread, NULL);
 }
 
-
 // Client code must call AudioMixer_freeWaveFileData to free dynamically allocated data.
-void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound)
-{
+void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound) {
 	assert(pSound);
 
 	// The PCM data in a wave file starts after the header:
@@ -101,7 +97,7 @@ void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound)
 	FILE *file = fopen(fileName, "r");
 	if (file == NULL) {
 		fprintf(stderr, "ERROR: Unable to open file %s.\n", fileName);
-		exit(EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 
 	// Get file size
@@ -117,27 +113,27 @@ void AudioMixer_readWaveFileIntoMemory(char *fileName, wavedata_t *pSound)
 	if (pSound->pData == 0) {
 		fprintf(stderr, "ERROR: Unable to allocate %d bytes for file %s.\n",
 				sizeInBytes, fileName);
-		exit(EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 
 	// Read PCM data from wave file into memory
-	int samplesRead = fread(pSound->pData, SAMPLE_SIZE, pSound->numSamples, file);
+	int samplesRead = fread(pSound->pData, SAMPLE_SIZE, pSound->numSamples,
+			file);
 	if (samplesRead != pSound->numSamples) {
-		fprintf(stderr, "ERROR: Unable to read %d samples from file %s (read %d).\n",
+		fprintf(stderr,
+				"ERROR: Unable to read %d samples from file %s (read %d).\n",
 				pSound->numSamples, fileName, samplesRead);
-		exit(EXIT_FAILURE);
+		exit (EXIT_FAILURE);
 	}
 }
 
-void AudioMixer_freeWaveFileData(wavedata_t *pSound)
-{
+void AudioMixer_freeWaveFileData(wavedata_t *pSound) {
 	pSound->numSamples = 0;
 	free(pSound->pData);
 	pSound->pData = NULL;
 }
 
-void AudioMixer_queueSound(wavedata_t *pSound)
-{
+void AudioMixer_queueSound(wavedata_t *pSound) {
 	// Ensure we are only being asked to play "good" sounds:
 	assert(pSound->numSamples > 0);
 	assert(pSound->pData);
@@ -147,7 +143,21 @@ void AudioMixer_queueSound(wavedata_t *pSound)
 	 * REVISIT: Implement this:
 	 * 1. Since this may be called by other threads, and there is a thread
 	 *    processing the soundBites[] array, we must ensure access is threadsafe.
-	 * 2. Search through the soundBites[] array looking for a free slot.
+	*/
+	pthread_mutex_lock(&audioMutex);
+
+	//	 2. Search through the soundBites[] array looking for a free slot.
+	int i;
+	wavedata_t check_if_null
+
+	
+	
+	for (i = 0; i < MAX_SOUND_BITES; i++) {
+		if (soundBites[i].pSound == NULL){
+			check_if_null = pSound;
+		}
+	}
+	/*
 	 * 3. If a free slot is found, place the new sound file into that slot.
 	 *    Note: You are only copying a pointer, not the entire data of the wave file!
 	 * 4. After searching through all slots, if no free slot is found then print
@@ -156,14 +166,10 @@ void AudioMixer_queueSound(wavedata_t *pSound)
 	 *    not being able to play another wave file.
 	 */
 
-
-
-
-
+//	pthread_mutex_unlock(&audioMutex);
 }
 
-void AudioMixer_cleanup(void)
-{
+void AudioMixer_cleanup(void) {
 	printf("Stopping audio...\n");
 
 	// Stop the PCM generation thread
@@ -181,12 +187,10 @@ void AudioMixer_cleanup(void)
 	playbackBuffer = NULL;
 
 	printf("Done stopping audio...\n");
-	fflush(stdout);
+	fflush (stdout);
 }
 
-
-int AudioMixer_getVolume()
-{
+int AudioMixer_getVolume() {
 	// Return the cached volume; good enough unless someone is changing
 	// the volume through other means and the cached value is out of date.
 	return volume;
@@ -195,8 +199,7 @@ int AudioMixer_getVolume()
 // Function copied from:
 // http://stackoverflow.com/questions/6787318/set-alsa-master-volume-from-c-code
 // Written by user "trenki".
-void AudioMixer_setVolume(int newVolume)
-{
+void AudioMixer_setVolume(int newVolume) {
 	// Ensure volume is reasonable; If so, cache it for later getVolume() calls.
 	if (newVolume < 0 || newVolume > AUDIOMIXER_MAX_VOLUME) {
 		printf("ERROR: Volume must be between 0 and 100.\n");
@@ -204,34 +207,32 @@ void AudioMixer_setVolume(int newVolume)
 	}
 	volume = newVolume;
 
-    long min, max;
-    snd_mixer_t *handle;
-    snd_mixer_selem_id_t *sid;
-    const char *card = "default";
-    const char *selem_name = "PCM";
+	long min, max;
+	snd_mixer_t * handle;
+	snd_mixer_selem_id_t *sid;
+	const char *card = "default";
+	const char *selem_name = "PCM";
 
-    snd_mixer_open(&handle, 0);
-    snd_mixer_attach(handle, card);
-    snd_mixer_selem_register(handle, NULL, NULL);
-    snd_mixer_load(handle);
+	snd_mixer_open(&handle, 0);
+	snd_mixer_attach(handle, card);
+	snd_mixer_selem_register(handle, NULL, NULL);
+	snd_mixer_load(handle);
 
-    snd_mixer_selem_id_alloca(&sid);
-    snd_mixer_selem_id_set_index(sid, 0);
-    snd_mixer_selem_id_set_name(sid, selem_name);
-    snd_mixer_elem_t* elem = snd_mixer_find_selem(handle, sid);
+	snd_mixer_selem_id_alloca(&sid);
+	snd_mixer_selem_id_set_index(sid, 0);
+	snd_mixer_selem_id_set_name(sid, selem_name);
+	snd_mixer_elem_t* elem = snd_mixer_find_selem(handle, sid);
 
-    snd_mixer_selem_get_playback_volume_range(elem, &min, &max);
-    snd_mixer_selem_set_playback_volume_all(elem, volume * max / 100);
+	snd_mixer_selem_get_playback_volume_range(elem, &min, &max);
+	snd_mixer_selem_set_playback_volume_all(elem, volume * max / 100);
 
-    snd_mixer_close(handle);
+	snd_mixer_close(handle);
 }
-
 
 // Fill the playbackBuffer array with new PCM values to output.
 //    playbackBuffer: buffer to fill with new PCM data from sound bites.
 //    size: the number of values to store into playbackBuffer
-static void fillPlaybackBuffer(short *playbackBuffer, int size)
-{
+static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	/*
 	 * REVISIT: Implement this
 	 * 1. Wipe the playbackBuffer to all 0's to clear any previous PCM data.
@@ -273,26 +274,17 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size)
 	 *
 	 */
 
-
-
-
-
-
-
 }
 
-
-void* playbackThread(void* arg)
-{
+void* playbackThread(void* arg) {
 
 	while (!stopping) {
 		// Generate next block of audio
 		fillPlaybackBuffer(playbackBuffer, playbackBufferSize);
 
-
 		// Output the audio
-		snd_pcm_sframes_t frames = snd_pcm_writei(handle,
-				playbackBuffer, playbackBufferSize);
+		snd_pcm_sframes_t frames = snd_pcm_writei(handle, playbackBuffer,
+				playbackBufferSize);
 
 		// Check for (and handle) possible error conditions on output
 		if (frames < 0) {
@@ -300,9 +292,10 @@ void* playbackThread(void* arg)
 			frames = snd_pcm_recover(handle, frames, 1);
 		}
 		if (frames < 0) {
-			fprintf(stderr, "ERROR: Failed writing audio with snd_pcm_writei(): %li\n",
+			fprintf(stderr,
+					"ERROR: Failed writing audio with snd_pcm_writei(): %li\n",
 					frames);
-			exit(EXIT_FAILURE);
+			exit (EXIT_FAILURE);
 		}
 		if (frames > 0 && frames < playbackBufferSize) {
 			printf("Short write (expected %li, wrote %li)\n",
@@ -312,19 +305,4 @@ void* playbackThread(void* arg)
 
 	return NULL;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
