@@ -1,0 +1,1 @@
+void beatModeSwich(int mode);

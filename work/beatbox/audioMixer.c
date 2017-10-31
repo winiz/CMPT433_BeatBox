@@ -270,35 +270,42 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	 *
 	 */
 
-	memset(playbackBuffer, 0, size * sizeof(*playbackBuffer));
-		
-		long pcm_sum;
-		pthread_mutex_lock(&audioMutex);
-		for (int i = 0; i < size; i++) {
-			pcm_sum = 0;
-			for (int j = 0; j < MAX_SOUND_BITES; j++) {
-				
-				if (soundBites[j].pSound != NULL) {
-					pcm_sum += soundBites[j].pSound->pData[soundBites[j].location];
-					soundBites[j].location++;
-					if(soundBites[j].location >= soundBites[j].pSound->numSamples){
-						soundBites[j].location = 0;
-						soundBites[j].pSound = NULL;
+	memset(playbackBuffer, 0, size * (sizeof(short)));
+	pthread_mutex_lock(&audioMutex);
+
+	//init as long to avoid overflow issues
+	long pcm_sum;
+
+	//outter loop loopthrough each slot in soundBites[] 
+	for (int i = 0; i < MAX_SOUND_BITES; i++) {
+		if (soundBites[i].pSound != NULL) {
+			int offset = soundBites[i].location;
+
+			//inner loopthrough every short in buffer
+			for (int j = 0; j < size; j++) {
+				// if offset fits into the current 735 slots
+				if (offset < soundBites[i].pSound->numSamples) {
+					pcm_sum = soundBites[i].pSound->pData[offset];
+					pcm_sum += playbackBuffer[j];
+					if (pcm_sum > SHRT_MAX) {
+						pcm_sum = SHRT_MAX;
+					} else if (pcm_sum < SHRT_MIN) {
+						pcm_sum = SHRT_MIN;
 					}
-				} 
-				
+					playbackBuffer[j] = (short) pcm_sum;
+					// if offset doesent fit 
+				} else {
+					soundBites[i].pSound = NULL;
+					soundBites[i].location = 0;
+					offset = 0;
+					break;
+				}
+				offset++;
 			}
-			
-			if (pcm_sum > SHRT_MAX) {
-				pcm_sum = SHRT_MAX;
-			} else if (pcm_sum < SHRT_MIN) {
-				pcm_sum = SHRT_MIN;
-			}
-			playbackBuffer[i] = (short) pcm_sum;
+			soundBites[i].location = offset;
 		}
-		
-		pthread_mutex_unlock(&audioMutex);
-		
+	}
+	pthread_mutex_unlock(&audioMutex);
 
 }
 
