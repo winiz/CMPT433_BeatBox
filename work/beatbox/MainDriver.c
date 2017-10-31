@@ -18,13 +18,7 @@ int main(void) {
 	
 	while (1){
 		alternative_drum_beat();
-			if(checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_UP)){
-				set_Volumn(1);
-			}
-			if(checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_DOWN)){
-				set_Volumn(0);
-			}
-		}
+	}
 
 	waveFilesFreer();
 	AudioMixer_cleanup();

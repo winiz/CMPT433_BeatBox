@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <pthread.h>
 #include "joystickControler.h"
 #include "audioMixer.h"
 
+
+static pthread_t joystickInputCapturethreadId;
 static int readFromFile(char *fileName);
 static void pinExporter(int value);
+void* joystickInputCapturethread(void* arg);
 
 void joystickControler_init(void) {
 	pinExporter (JOYSTICK_GPIO_VALUE_UP);
@@ -14,6 +18,8 @@ void joystickControler_init(void) {
 	pinExporter (JOYSTICK_GPIO_VALUE_DOWN);
 	pinExporter (JOYSTICK_GPIO_VALUE_LEFT);
 	pinExporter (JOYSTICK_GPIO_VALUE_IN);
+	pthread_create(&joystickInputCapturethreadId, NULL,
+			joystickInputCapturethread, NULL);
 }
 
 static void pinExporter(int gpioNum) {
@@ -63,13 +69,13 @@ void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to duckduck
 
 void set_Volumn(_Bool isUP) {
 	int offset = 0;
-	if (isUP){
+	if (isUP) {
 		offset = 5;
-	}else{
+	} else {
 		offset = -5;
 	}
 	int Volume_To_Be_Set = AudioMixer_getVolume() + offset;
-	
+
 	if (Volume_To_Be_Set > MAX_VOL) {
 		printf("Maximum Volumn Reached!\n");
 		Volume_To_Be_Set = 100;
@@ -81,5 +87,17 @@ void set_Volumn(_Bool isUP) {
 }
 
 void joystickControler_cleanup(void) {
-	//TODO
+	pthread_join(joystickInputCapturethreadId, NULL);
+}
+
+void* joystickInputCapturethread(void* arg) {
+	while (1) {
+		if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_UP)) {
+			set_Volumn(1);
+		}
+		if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_DOWN)) {
+			set_Volumn(0);
+		}
+		busyWait();
+	}
 }
