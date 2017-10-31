@@ -1,9 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 #include "joystickControler.h"
 
 static int readFromFile(char *fileName);
+static void pinExporter(int value);
+
+void joystickControler_init(void){
+	pinExporter(JOYSTICK_GPIO_VALUE_UP);
+	pinExporter(JOYSTICK_GPIO_VALUE_RIGHT);
+	pinExporter(JOYSTICK_GPIO_VALUE_DOWN);
+	pinExporter(JOYSTICK_GPIO_VALUE_LEFT);
+	pinExporter(JOYSTICK_GPIO_VALUE_IN);
+}
+
+static void pinExporter(int gpioNum){
+	FILE *pfile = fopen(GPIO_EXPORT_PATH, "w");
+	if (pfile == NULL) {
+		printf("ERROR: Unable to open export file.\n");
+		exit(1);
+	}
+
+	// Write to data to the file using fprintf():
+	fprintf(pfile, "%d", gpioNum);
+
+	// Close the file using fclose():
+	fclose(pfile);
+}
 
 static int readFromFile(char *fileName) {
 	FILE *pfile = fopen(fileName, "r");
@@ -21,12 +45,23 @@ static int readFromFile(char *fileName) {
 	return boo;
 }
 
-_Bool checkIfPressedUp() {
-	int boo = readFromFile(JOYSTICK_GPIO_VALUE_PATH);
+_Bool checkIfPressed(char *fileName){
+	int boo = readFromFile(fileName);
 	if (boo == 0) {
 		printf("pressed up\n");
 		return 1;
 	} else {
 		return 0;
 	}
+}
+
+void busyWait(void){ //hard coded to 600 ms which is 6e+8 according to duckduckgo
+	int seconds = 0;
+	long nanoseconds = 600000000;
+	struct timespec reqDelay = {seconds, nanoseconds};
+	nanosleep(&reqDelay, (struct timespec *) NULL);
+}
+
+void joystickControler_cleanup(void){
+	//TODO
 }

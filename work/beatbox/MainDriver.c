@@ -7,22 +7,21 @@
 #include "audioMixer.h"
 #include "joystickControler.h"
 
-void busyWait(){ //hard coded to 600 ms which is 6e+8 according to duckduckgo
-	long seconds = 0;
-	long nanoseconds = 600000000;
-	struct timespec reqDelay = {seconds, nanoseconds};
-	nanosleep(&reqDelay, (struct timespec *) NULL);
-}
+
 
 int main(void) {
 	printf("Beginning play-back of %s\n", SOURCE_FILE_BASEDRUM);
 	AudioMixer_init();
+	joystickControler_init();
 
 	waveFilesReader();
 	
 	while (1){
-			while (checkIfPressedUp()){
+			while (checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_UP)){
 				standard_rock_drum_beat();
+			}
+			while (checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_DOWN)){
+				alternative_drum_beat();
 			}
 			busyWait();
 		}
