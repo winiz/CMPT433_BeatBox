@@ -49,13 +49,11 @@ void AudioMixer_init(void) {
 	// Initialize the currently active sound-bites being played
 	// REVISIT:- Implement this. Hint: set the pSound pointer to NULL for each
 	//     sound bite.
-	pthread_mutex_lock(&audioMutex);
 	int i;
 	for (i = 0; i < MAX_SOUND_BITES; i++) {
 		soundBites[i].pSound = NULL;
 		soundBites[i].location = 0;
 	}
-	pthread_mutex_unlock(&audioMutex);
 
 	// Open the PCM output
 	int err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
@@ -153,17 +151,18 @@ void AudioMixer_queueSound(wavedata_t *pSound) {
 	 *    not being able to play another wave file.
 	 */
 
-	pthread_mutex_lock(&audioMutex);
-	for (int i = 0; i < 1; i++) {
+	for (int i = 0; i < MAX_SOUND_BITES; i++) {
 		if (soundBites[i].pSound == NULL) {
+			pthread_mutex_lock(&audioMutex);
 			soundBites[i].pSound = pSound;
-			break;
+			pthread_mutex_unlock(&audioMutex);
+			return;
 		}
 		if (i == MAX_SOUND_BITES - 1) {
 			printf("no free slots is found in sondBites\n");
 		}
 	}
-	pthread_mutex_unlock(&audioMutex);
+
 }
 
 void AudioMixer_cleanup(void) {
@@ -271,30 +270,46 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	 *
 	 */
 
+	memset(playbackBuffer, 0, size * (sizeof(short)));
 	pthread_mutex_lock(&audioMutex);
-	memset(playbackBuffer, 0, size * sizeof(*playbackBuffer));
-	int prev_location; 
-	for (int i = 0; i < size; i++) {
-		prev_location = soundBites[0].location;
-		printf("prev_location %d\n",prev_location);
-		printf("size %d\n",size);
-		printf("numSamples %d\n",(soundBites[0].pSound)->numSamples);
+	long pcm_sum;
+	for (int i = 0; i < MAX_SOUND_BITES; i++) {
+		if (soundBites[i].pSound != NULL) {
+			int offset = soundBites[i].location;
+			for (int j = 0; j < size; j++) {
+				if (offset < soundBites[i].pSound->numSamples) {
+					pcm_sum = soundBites[i].pSound->pData[offset];
+					pcm_sum += playbackBuffer[j];
+					if (pcm_sum > SHRT_MAX) {
+						pcm_sum = SHRT_MAX;
+					} else if (pcm_sum < SHRT_MIN) {
+						pcm_sum = SHRT_MIN;
+					}
+					playbackBuffer[j] = (short)pcm_sum;
+				} else {
+					soundBites[i].pSound = NULL;
+					soundBites[i].location = 0;
+					offset = 0;
+					break;
+				}
+				offset++;
+			}
+			soundBites[i].location = offset;
+		}
 	}
-	
 	pthread_mutex_unlock(&audioMutex);
+
 }
 
 void* playbackThread(void* arg) {
 
 	while (!stopping) {
 		// Generate next block of audio
-		printf("Generate next block of audio\n");
 		fillPlaybackBuffer(playbackBuffer, playbackBufferSize);
 
 		// Output the audio
 		snd_pcm_sframes_t frames = snd_pcm_writei(handle, playbackBuffer,
 				playbackBufferSize);
-
 
 		// Check for (and handle) possible error conditions on output
 		if (frames < 0) {

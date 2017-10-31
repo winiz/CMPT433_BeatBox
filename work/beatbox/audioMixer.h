@@ -34,6 +34,4 @@ void AudioMixer_queueSound(wavedata_t *pSound);
 int  AudioMixer_getVolume();
 void AudioMixer_setVolume(int newVolume);
 
-void* playbackThread(void* arg);
-
 #endif

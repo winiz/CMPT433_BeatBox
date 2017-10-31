@@ -1,17 +1,23 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <pthread.h>
 #include <alsa/asoundlib.h>
+
 #include "audioMixer.h"
 
-int main(void)
-{
-	printf("Beginning play-back of %s\n", SOURCE_FILE_SNARE);
-	// Configure Output Device
-	wavedata_t file_snare;
+int main (void) {
+	printf("Beginning play-back of %s\n", SOURCE_FILE_BASEDRUM);
 	AudioMixer_init();
-	AudioMixer_readWaveFileIntoMemory(SOURCE_FILE_SNARE, &file_snare);
-//	printf("numSamplesM %d\n",file_snare.numSamples);
-	AudioMixer_queueSound(&file_snare);
-	AudioMixer_freeWaveFileData(&file_snare);
+	wavedata_t sampleFile;
+	AudioMixer_readWaveFileIntoMemory(SOURCE_FILE_BASEDRUM, &sampleFile);
+	for (int i = 0; i < 4; i++) {
+		AudioMixer_queueSound(&sampleFile);
+		sleep(1);
+	}
+	AudioMixer_freeWaveFileData(&sampleFile);
 	AudioMixer_cleanup();
+	
 	printf("Done!\n");
 	return 0;
 }

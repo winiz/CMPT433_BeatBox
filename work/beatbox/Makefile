@@ -36,7 +36,7 @@ all: wav
 # Copy wave files to the shared folder
 wav:
 	mkdir -p $(PUBDIR)/beatbox-wave-files/
-	cp beatbox-wave-files/* $(PUBDIR)/beatbox-wave-files/ 
+	cp -R beatbox-wave-files/* $(PUBDIR)/beatbox-wave-files/ 
 
 #node:
 #	mkdir -p $(PUBDIR)/beatbox-server-copy/
