@@ -17,13 +17,13 @@ int main(void) {
 	waveFilesReader();
 	
 	while (1){
-			while (checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_UP)){
-				standard_rock_drum_beat();
+		alternative_drum_beat();
+			if(checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_UP)){
+				set_Volumn(1);
 			}
-			while (checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_DOWN)){
-				alternative_drum_beat();
+			if(checkIfPressed(JOYSTICK_GPIO_VALUE_PATH_DOWN)){
+				set_Volumn(0);
 			}
-			busyWait();
 		}
 
 	waveFilesFreer();

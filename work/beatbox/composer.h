@@ -7,6 +7,7 @@
 
 #define MIN_BPM 40
 #define MAX_BPM 300
+
 #define DEFAULT_BPM (double)120
 
 void waveFilesReader(void);

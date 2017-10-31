@@ -14,9 +14,13 @@
 #define JOYSTICK_GPIO_VALUE_LEFT 65
 #define JOYSTICK_GPIO_VALUE_IN 27
 
+#define MIN_VOL 0
+#define MAX_VOL 100
+
 void joystickControler_init(void);
-_Bool checkIfPressedUp(char *fileName);
+_Bool checkIfPressed(char *fileName);
 void joystickControler_cleanup(void);
 void busyWait(void);
+void set_Volumn(_Bool isUP);
 
 #endif
