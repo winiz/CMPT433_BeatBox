@@ -13,7 +13,8 @@ int main(void) {
 	waveFilesReader();
 	
 	while (1) {
-		drumBeatMode(1);
+		standard_rock_drum_beat();
+		alternative_drum_beat();
 	}
 
 	waveFilesFreer();

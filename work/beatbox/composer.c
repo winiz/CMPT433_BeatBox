@@ -22,23 +22,34 @@ static void tempoControler(double bpm) {
 	nanosleep(&delay, NULL);
 }
 
-void drumBeatMode(int mode) {
-	if (mode == 1) {
-		for (int i = 0; i < 8; i++) {
-			if (i % 2 == 0) {
-				if (i == 2 || i == 6) {
-					AudioMixer_queueSound(&snare);
-				} else {
-					AudioMixer_queueSound(&base);
-				}
+void standard_rock_drum_beat(void) {
+	// basic standard rock drum beat
+	for (int i = 0; i < 8; i++) {
+		if (i % 2 == 0) {
+			if (i == 2 || i == 6) {
+				AudioMixer_queueSound(&snare);
+			} else {
+				AudioMixer_queueSound(&base);
 			}
-			AudioMixer_queueSound(&hihat);
-			tempoControler(DEFAULT_BPM);
 		}
+		AudioMixer_queueSound(&hihat);
+		tempoControler (DEFAULT_BPM);
 	}
 }
 
-
+void alternative_drum_beat(void) {
+	// drumbeat idea copied from https://www.musikalessons.com/blog/2016/06/basic-drum-beats-for-rock/
+	for (int i = 0; i < 8; i++) {
+		if (i == 0 || i == 3 || i == 4) {
+			AudioMixer_queueSound(&base);
+		}
+		if (i == 2 || i == 6) {
+			AudioMixer_queueSound(&snare);
+		}
+		AudioMixer_queueSound(&hihat);
+		tempoControler (DEFAULT_BPM);
+	}
+}
 
 void waveFilesFreer(void) {
 	AudioMixer_freeWaveFileData(&base);

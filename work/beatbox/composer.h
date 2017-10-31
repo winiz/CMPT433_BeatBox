@@ -10,7 +10,8 @@
 #define DEFAULT_BPM (double)120
 
 void waveFilesReader(void);
-void drumBeatMode(int mode);
+void standard_rock_drum_beat(void);
+void alternative_drum_beat(void);
 void waveFilesFreer(void);
 
 #endif
