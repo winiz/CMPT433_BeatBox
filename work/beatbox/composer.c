@@ -19,7 +19,7 @@ static void tempoControler(double bpm) {
 	long halfBeat = (long) ((60 / bpm / 2) * 1000000);
 	delay.tv_sec = 0;
 	delay.tv_nsec = (halfBeat % 1000000) * 1000;
-	nanosleep(&delay, NULL);
+	nanosleep(&delay, (struct timespec *)NULL);
 }
 
 void standard_rock_drum_beat(void) {
@@ -33,7 +33,7 @@ void standard_rock_drum_beat(void) {
 			}
 		}
 		AudioMixer_queueSound(&hihat);
-		tempoControler (DEFAULT_BPM);
+		tempoControler(DEFAULT_BPM);
 	}
 }
 
@@ -47,7 +47,7 @@ void alternative_drum_beat(void) {
 			AudioMixer_queueSound(&snare);
 		}
 		AudioMixer_queueSound(&hihat);
-		tempoControler (DEFAULT_BPM);
+		tempoControler(DEFAULT_BPM);
 	}
 }
 

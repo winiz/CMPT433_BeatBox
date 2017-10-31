@@ -5,6 +5,14 @@
 
 #include "composer.h"
 #include "audioMixer.h"
+#include "joystickControler.h"
+
+void busyWait(){ //hard coded to 600 ms which is 6e+8 according to duckduckgo
+	long seconds = 0;
+	long nanoseconds = 600000000;
+	struct timespec reqDelay = {seconds, nanoseconds};
+	nanosleep(&reqDelay, (struct timespec *) NULL);
+}
 
 int main(void) {
 	printf("Beginning play-back of %s\n", SOURCE_FILE_BASEDRUM);
@@ -12,10 +20,12 @@ int main(void) {
 
 	waveFilesReader();
 	
-	while (1) {
-		standard_rock_drum_beat();
-		alternative_drum_beat();
-	}
+	while (1){
+			while (checkIfPressedUp()){
+				standard_rock_drum_beat();
+			}
+			busyWait();
+		}
 
 	waveFilesFreer();
 	AudioMixer_cleanup();
