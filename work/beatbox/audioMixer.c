@@ -2,6 +2,7 @@
 // which are left as incomplete.
 // Note: Generates low latency audio on BeagleBone Black; higher latency found on host.
 #include "audioMixer.h"
+
 #include <alsa/asoundlib.h>
 #include <stdbool.h>
 #include <pthread.h>
@@ -280,11 +281,11 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	for (int i = 0; i < MAX_SOUND_BITES; i++) {
 		if (soundBites[i].pSound != NULL) {
 			int offset = soundBites[i].location;
-
+			int totalSamples = soundBites[i].pSound->numSamples;
 			//inner loopthrough every short in buffer
 			for (int j = 0; j < size; j++) {
 				// if offset fits into the current 735 slots
-				if (offset < soundBites[i].pSound->numSamples) {
+				if (offset < totalSamples) {
 					pcm_sum = soundBites[i].pSound->pData[offset];
 					pcm_sum += playbackBuffer[j];
 					if (pcm_sum > SHRT_MAX) {
@@ -295,8 +296,8 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 					playbackBuffer[j] = (short) pcm_sum;
 					// if offset doesent fit 
 				} else {
-					soundBites[i].pSound = NULL;
 					soundBites[i].location = 0;
+					soundBites[i].pSound = NULL;
 					offset = 0;
 					break;
 				}
