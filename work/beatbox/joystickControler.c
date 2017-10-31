@@ -9,6 +9,7 @@
 
 static pthread_t joystickInputCapturethreadId;
 static int readFromFile(char *fileName);
+static void set_Volumn(_Bool isUP);
 static void pinExporter(int value);
 void* joystickInputCapturethread(void* arg);
 
@@ -53,7 +54,7 @@ static int readFromFile(char *fileName) {
 _Bool checkIfPressed(char *fileName) {
 	int boo = readFromFile(fileName);
 	if (boo == 0) {
-		printf("pressed\n");
+		printf("joystick pressed...\n");
 		return 1;
 	} else {
 		return 0;
@@ -67,7 +68,7 @@ void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to duckduck
 	nanosleep(&reqDelay, (struct timespec *) NULL);
 }
 
-void set_Volumn(_Bool isUP) {
+static void set_Volumn(_Bool isUP) {
 	int offset = 0;
 	if (isUP) {
 		offset = 5;
