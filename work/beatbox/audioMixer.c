@@ -270,34 +270,35 @@ static void fillPlaybackBuffer(short *playbackBuffer, int size) {
 	 *
 	 */
 
-	memset(playbackBuffer, 0, size * (sizeof(short)));
-	pthread_mutex_lock(&audioMutex);
-	long pcm_sum;
-	for (int i = 0; i < MAX_SOUND_BITES; i++) {
-		if (soundBites[i].pSound != NULL) {
-			int offset = soundBites[i].location;
-			for (int j = 0; j < size; j++) {
-				if (offset < soundBites[i].pSound->numSamples) {
-					pcm_sum = soundBites[i].pSound->pData[offset];
-					pcm_sum += playbackBuffer[j];
-					if (pcm_sum > SHRT_MAX) {
-						pcm_sum = SHRT_MAX;
-					} else if (pcm_sum < SHRT_MIN) {
-						pcm_sum = SHRT_MIN;
+	memset(playbackBuffer, 0, size * sizeof(*playbackBuffer));
+		
+		long pcm_sum;
+		pthread_mutex_lock(&audioMutex);
+		for (int i = 0; i < size; i++) {
+			pcm_sum = 0;
+			for (int j = 0; j < MAX_SOUND_BITES; j++) {
+				
+				if (soundBites[j].pSound != NULL) {
+					pcm_sum += soundBites[j].pSound->pData[soundBites[j].location];
+					soundBites[j].location++;
+					if(soundBites[j].location >= soundBites[j].pSound->numSamples){
+						soundBites[j].location = 0;
+						soundBites[j].pSound = NULL;
 					}
-					playbackBuffer[j] = (short)pcm_sum;
-				} else {
-					soundBites[i].pSound = NULL;
-					soundBites[i].location = 0;
-					offset = 0;
-					break;
-				}
-				offset++;
+				} 
+				
 			}
-			soundBites[i].location = offset;
+			
+			if (pcm_sum > SHRT_MAX) {
+				pcm_sum = SHRT_MAX;
+			} else if (pcm_sum < SHRT_MIN) {
+				pcm_sum = SHRT_MIN;
+			}
+			playbackBuffer[i] = (short) pcm_sum;
 		}
-	}
-	pthread_mutex_unlock(&audioMutex);
+		
+		pthread_mutex_unlock(&audioMutex);
+		
 
 }
 
