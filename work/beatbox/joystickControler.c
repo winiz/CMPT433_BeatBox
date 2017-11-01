@@ -5,12 +5,13 @@
 #include <pthread.h>
 #include "joystickControler.h"
 #include "audioMixer.h"
-
+#include "composer.h"
 
 static pthread_t joystickInputCapturethreadId;
+static void joystickControler_setVolume(_Bool isUP);
 static int readFromFile(char *fileName);
-static void set_Volumn(_Bool isUP);
 static void pinExporter(int value);
+static void busyWait(void);
 void* joystickInputCapturethread(void* arg);
 
 void joystickControler_init(void) {
@@ -61,14 +62,14 @@ _Bool checkIfPressed(char *fileName) {
 	}
 }
 
-void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to duckduckgo
+static void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to duckduckgo
 	int seconds = 0;
 	long nanoseconds = 600000000;
 	struct timespec reqDelay = { seconds, nanoseconds };
 	nanosleep(&reqDelay, (struct timespec *) NULL);
 }
 
-static void set_Volumn(_Bool isUP) {
+static void joystickControler_setVolume(_Bool isUP) {
 	int offset = 0;
 	if (isUP) {
 		offset = 5;
@@ -79,12 +80,31 @@ static void set_Volumn(_Bool isUP) {
 
 	if (Volume_To_Be_Set > MAX_VOL) {
 		printf("Maximum Volumn Reached!\n");
-		Volume_To_Be_Set = 100;
+		Volume_To_Be_Set = MAX_VOL;
 	} else if (Volume_To_Be_Set < MIN_VOL) {
 		printf("Minimum Volumn Reached!\n");
-		Volume_To_Be_Set = 100;
+		Volume_To_Be_Set = MIN_VOL;
 	}
 	AudioMixer_setVolume(Volume_To_Be_Set);
+}
+
+static void joystickControler_setTempo(_Bool isLEFT) {
+	int offset = 0;
+	if (isLEFT) {
+		offset = 5;
+	} else {
+		offset = -5;
+	}
+	int Tempo_To_Be_Set = composer_getTempo() + offset;
+
+	if (Tempo_To_Be_Set > MAX_BPM) {
+		printf("Maximum Tempo Reached!\n");
+		Tempo_To_Be_Set = MAX_BPM;
+	} else if (Tempo_To_Be_Set < MIN_BPM) {
+		printf("Minimum Tempo Reached!\n");
+		Tempo_To_Be_Set = MIN_BPM;
+	}
+	composer_setTempo(Tempo_To_Be_Set);
 }
 
 void joystickControler_cleanup(void) {
@@ -94,10 +114,13 @@ void joystickControler_cleanup(void) {
 void* joystickInputCapturethread(void* arg) {
 	while (1) {
 		if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_UP)) {
-			set_Volumn(1);
-		}
-		if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_DOWN)) {
-			set_Volumn(0);
+			joystickControler_setVolume(1);
+		} else if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_DOWN)) {
+			joystickControler_setVolume(0);
+		} else if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_LEFT)) {
+			joystickControler_setTempo(1);
+		} else if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_RIGHT)) {
+			joystickControler_setTempo(0);
 		}
 		busyWait();
 	}

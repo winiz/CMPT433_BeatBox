@@ -11,6 +11,9 @@
 #define DEFAULT_BPM (double)120
 
 void waveFilesReader(void);
+double composer_getTempo(void);
+void composer_setTempo(double newTempo);
+void no_drum_beat(void);
 void standard_rock_drum_beat(void);
 void alternative_drum_beat(void);
 void waveFilesFreer(void);

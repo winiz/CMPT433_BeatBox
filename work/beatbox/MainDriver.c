@@ -22,7 +22,7 @@ int main(void) {
 
 	waveFilesFreer();
 	AudioMixer_cleanup();
-
+	joystickControler_cleanup();
 	printf("Done!\n");
 	return 0;
 }

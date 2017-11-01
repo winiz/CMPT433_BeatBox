@@ -1,10 +1,12 @@
 #include <time.h>
+#include <stdio.h>
 #include "composer.h"
 #include "audioMixer.h"
 
 static wavedata_t base;
 static wavedata_t hihat;
 static wavedata_t snare;
+static double Tempo = DEFAULT_BPM;
 
 static void tempoControler(double bpm);
 
@@ -19,7 +21,20 @@ static void tempoControler(double bpm) {
 	long halfBeat = (long) ((60 / bpm / 2) * 1000000);
 	delay.tv_sec = 0;
 	delay.tv_nsec = (halfBeat % 1000000) * 1000;
-	nanosleep(&delay, (struct timespec *)NULL);
+	nanosleep(&delay, (struct timespec *) NULL);
+}
+
+double composer_getTempo(void) {
+	return Tempo;
+}
+
+void composer_setTempo(double newTempo) {
+	Tempo = newTempo;
+	printf("current tempo is %d \n", (int) Tempo);
+}
+
+void no_drum_beat(void) {
+	tempoControler(Tempo);
 }
 
 void standard_rock_drum_beat(void) {
@@ -33,7 +48,7 @@ void standard_rock_drum_beat(void) {
 			}
 		}
 		AudioMixer_queueSound(&hihat);
-		tempoControler(DEFAULT_BPM);
+		tempoControler(Tempo);
 	}
 }
 
@@ -47,7 +62,7 @@ void alternative_drum_beat(void) {
 			AudioMixer_queueSound(&snare);
 		}
 		AudioMixer_queueSound(&hihat);
-		tempoControler(DEFAULT_BPM);
+		tempoControler (DEFAULT_BPM);
 	}
 }
 

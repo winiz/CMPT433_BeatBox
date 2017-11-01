@@ -20,6 +20,5 @@
 void joystickControler_init(void);
 _Bool checkIfPressed(char *fileName);
 void joystickControler_cleanup(void);
-void busyWait(void);
 
 #endif
