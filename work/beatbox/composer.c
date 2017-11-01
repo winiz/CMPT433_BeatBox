@@ -25,6 +25,7 @@ static void tempoControler(double bpm) {
 }
 
 double composer_getTempo(void) {
+	printf("original tempo is %d \n", (int) Tempo);
 	return Tempo;
 }
 
@@ -62,7 +63,7 @@ void alternative_drum_beat(void) {
 			AudioMixer_queueSound(&snare);
 		}
 		AudioMixer_queueSound(&hihat);
-		tempoControler (DEFAULT_BPM);
+		tempoControler(Tempo);
 	}
 }
 
