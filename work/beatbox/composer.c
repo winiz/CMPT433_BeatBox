@@ -8,7 +8,7 @@ static wavedata_t base;
 static wavedata_t hihat;
 static wavedata_t snare;
 static double Tempo = DEFAULT_BPM;
-static int whichBeat = 1;
+static int whichBeat = 2;
 static pthread_t composerthreadId;
 void* composerthread(void* arg);
 
@@ -43,7 +43,7 @@ void composer_switchBeat(void) {
 	if (whichBeat < 3) {
 		whichBeat++;
 	} else {
-		whichBeat = 0;
+		whichBeat = 1;
 	}
 	printf("current beatMode is %d \n", whichBeat);
 }
@@ -87,13 +87,13 @@ void composer_cleanup(void) {
 void* composerthread(void* arg) {
 	while (1) {
 		switch (whichBeat) {
-		case 0:
+		case 1:
 			tempoControler(Tempo);
 			break;
-		case 1:
+		case 2:
 			standard_rock_drum_beat();
 			break;
-		case 2:
+		case 3:
 			alternative_drum_beat();
 			break;
 		}
