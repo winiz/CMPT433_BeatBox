@@ -6,7 +6,8 @@
 #include "composer.h"
 #include "audioMixer.h"
 #include "joystickControler.h"
-
+#include "accelerometerControler.h"
+#include "udpListener.h"
 
 
 int main(void) {
@@ -14,9 +15,12 @@ int main(void) {
 	AudioMixer_init();
 	joystickControler_init();
 	composer_init();
+	UdpListener_startListening();
+	
 	
 	joystickControler_cleanup();
 	composer_cleanup();
+	UdpListener_cleanup();
 	AudioMixer_cleanup();
 	
 	printf("Done!\n");

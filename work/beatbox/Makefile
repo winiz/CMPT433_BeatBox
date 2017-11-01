@@ -4,7 +4,7 @@
 # Edit this file to compile extra C files into their own programs.
 TARGET= audioMixer
 
-SOURCES= MainDriver.c audioMixer.c composer.c joystickControler.c
+SOURCES= MainDriver.c audioMixer.c composer.c joystickControler.c accelerometerControler.c udpListener.c
 
 PUBDIR = $(HOME)/cmpt433/public/myApps
 OUTDIR = $(PUBDIR)
