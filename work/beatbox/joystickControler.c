@@ -64,7 +64,7 @@ _Bool checkIfPressed(char *fileName) {
 
 static void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to duckduckgo
 	int seconds = 0;
-	long nanoseconds = 600000000;
+	long nanoseconds = 100000000;
 	struct timespec reqDelay = { seconds, nanoseconds };
 	nanosleep(&reqDelay, (struct timespec *) NULL);
 }
