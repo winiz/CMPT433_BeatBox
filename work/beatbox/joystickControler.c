@@ -121,6 +121,8 @@ void* joystickInputCapturethread(void* arg) {
 			joystickControler_setTempo(1);
 		} else if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_RIGHT)) {
 			joystickControler_setTempo(0);
+		}else if (checkIfPressed (JOYSTICK_GPIO_VALUE_PATH_IN)) {
+			composer_switchBeat();
 		}
 		busyWait();
 	}

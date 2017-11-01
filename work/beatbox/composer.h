@@ -13,7 +13,7 @@
 void composer_init(void);
 double composer_getTempo(void);
 void composer_setTempo(double newTempo);
-void no_drum_beat(void);
+void composer_switchBeat(void);
 void standard_rock_drum_beat(void);
 void alternative_drum_beat(void);
 void composer_cleanup(void);

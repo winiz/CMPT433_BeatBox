@@ -1,0 +1,12 @@
+switch (whichBeat) {
+		case 0:
+			tempoControler(Tempo);
+			break;
+		case 1:
+			standard_rock_drum_beat();
+			break;
+		case 2:
+			alternative_drum_beat();
+			break;
+		}
+		

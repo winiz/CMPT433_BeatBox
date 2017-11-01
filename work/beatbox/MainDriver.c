@@ -10,7 +10,7 @@
 
 
 int main(void) {
-	printf("Beginning play-back of %s\n", SOURCE_FILE_BASEDRUM);
+	printf("Beginning play-back \n");
 	AudioMixer_init();
 	joystickControler_init();
 	composer_init();
