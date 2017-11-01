@@ -13,16 +13,12 @@ int main(void) {
 	printf("Beginning play-back of %s\n", SOURCE_FILE_BASEDRUM);
 	AudioMixer_init();
 	joystickControler_init();
-
-	waveFilesReader();
+	composer_init();
 	
-	while (1){
-		alternative_drum_beat();
-	}
-
-	waveFilesFreer();
-	AudioMixer_cleanup();
 	joystickControler_cleanup();
+	composer_cleanup();
+	AudioMixer_cleanup();
+	
 	printf("Done!\n");
 	return 0;
 }

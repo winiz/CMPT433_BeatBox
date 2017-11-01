@@ -1,5 +1,6 @@
 #include <time.h>
 #include <stdio.h>
+#include <pthread.h>
 #include "composer.h"
 #include "audioMixer.h"
 
@@ -7,13 +8,16 @@ static wavedata_t base;
 static wavedata_t hihat;
 static wavedata_t snare;
 static double Tempo = DEFAULT_BPM;
+static pthread_t composerthreadId;
+void* composerthread(void* arg);
 
 static void tempoControler(double bpm);
 
-void waveFilesReader(void) {
+void composer_init(void) {
 	AudioMixer_readWaveFileIntoMemory(SOURCE_FILE_BASEDRUM, &base);
 	AudioMixer_readWaveFileIntoMemory(SOURCE_FILE_HIHAT, &hihat);
 	AudioMixer_readWaveFileIntoMemory(SOURCE_FILE_SNARE, &snare);
+	pthread_create(&composerthreadId, NULL, composerthread, NULL);
 }
 
 static void tempoControler(double bpm) {
@@ -67,8 +71,15 @@ void alternative_drum_beat(void) {
 	}
 }
 
-void waveFilesFreer(void) {
+void composer_cleanup(void) {
 	AudioMixer_freeWaveFileData(&base);
 	AudioMixer_freeWaveFileData(&hihat);
 	AudioMixer_freeWaveFileData(&snare);
+	pthread_join(composerthreadId, NULL);
+}
+
+void* composerthread(void* arg) {
+	while (1){
+		alternative_drum_beat();
+	}
 }
