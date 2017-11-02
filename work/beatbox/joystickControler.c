@@ -8,7 +8,6 @@
 #include "composer.h"
 
 static pthread_t joystickInputCapturethreadId;
-static void joystickControler_setVolume(_Bool isUP);
 static int readFromFile(char *fileName);
 static void pinExporter(int value);
 static void busyWait(void);
@@ -69,7 +68,7 @@ static void busyWait(void) { //hard coded to 600 ms which is 6e+8 according to d
 	nanosleep(&reqDelay, (struct timespec *) NULL);
 }
 
-static void joystickControler_setVolume(_Bool isUP) {
+void joystickControler_setVolume(_Bool isUP) {
 	int offset = 0;
 	if (isUP) {
 		offset = 5;
@@ -88,7 +87,7 @@ static void joystickControler_setVolume(_Bool isUP) {
 	AudioMixer_setVolume(Volume_To_Be_Set);
 }
 
-static void joystickControler_setTempo(_Bool isLEFT) {
+void joystickControler_setTempo(_Bool isLEFT) {
 	int offset = 0;
 	if (isLEFT) {
 		offset = 5;

@@ -38,9 +38,9 @@ wav:
 	mkdir -p $(PUBDIR)/beatbox-wave-files/
 	cp -R beatbox-wave-files/* $(PUBDIR)/beatbox-wave-files/ 
 
-#node:
-#	mkdir -p $(PUBDIR)/beatbox-server-copy/
-#	cp beatbox-server-copy/* $(PUBDIR)/beatbox-server-copy/ 
+node:
+	mkdir -p $(PUBDIR)/beatbox-server-copy/
+	cp -R beatbox-server-copy/* $(PUBDIR)/beatbox-server-copy/ 
 	
 clean:
 	rm -f $(OUTDIR)/$(TARGET)

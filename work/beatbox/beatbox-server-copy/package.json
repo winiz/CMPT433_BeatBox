@@ -1,0 +1,9 @@
+{
+	"name": "beatbox-server-copy",
+	"version": "0.0.1",
+	"description": "UDP messages from Node.js to beatbox.",
+	"dependencies": {
+		"socket.io": "~0.9.6",
+		"mime": "~1.2.7"
+	}
+}

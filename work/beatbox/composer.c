@@ -48,6 +48,15 @@ void composer_switchBeat(void) {
 	printf("current beatMode is %d \n", whichBeat);
 }
 
+void composer_setwhichBeat(int BeatUwant) {
+	whichBeat = BeatUwant;
+}
+
+void no_drum_beat(void) {
+	for (int i = 0; i < 8; i++) {
+			tempoControler(Tempo);
+		}
+}
 void standard_rock_drum_beat(void) {
 	// basic standard rock drum beat
 	for (int i = 0; i < 8; i++) {
@@ -88,7 +97,7 @@ void* composerthread(void* arg) {
 	while (1) {
 		switch (whichBeat) {
 		case 1:
-			tempoControler(Tempo);
+			no_drum_beat();
 			break;
 		case 2:
 			standard_rock_drum_beat();

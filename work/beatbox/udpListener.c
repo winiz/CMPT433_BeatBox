@@ -1,5 +1,4 @@
 // udpListener.c
-#include "udpListener.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <netdb.h>
@@ -7,18 +6,22 @@
 #include <unistd.h>			// for close()
 #include <pthread.h>
 #include <stdbool.h>
+#include "composer.h"
+#include "udpListener.h"
+#include "joystickControler.h"
 
 #define UDP_PORT 12345
 #define MAX_RECEIVE_MESSAGE_LENGTH 1024
 #define REPLY_BUFFER_SIZE (1500)
 #define VALUES_PER_LINE 4
 
-#define COMMAND_HELP        "help"
-#define COMMAND_COUNT       "count"
-#define COMMAND_GET_LENGTH  "get length"
-#define COMMAND_GET_ARRAY   "get array"
-#define COMMAND_GET         "get"
-#define COMMAND_STOP        "stop"
+#define COMMAND_MODEROCK0       "modeRock0"
+#define COMMAND_MODEROCK1       "modeRock1"
+#define COMMAND_MODEROCK2       "modeRock2"
+#define COMMAND_VOLUMEDOWN      "volumeDown"
+#define COMMAND_VOLUMEUP        "volumeUp"
+#define COMMAND_TEMPODOWN       "tempoDown"
+#define COMMAND_TEMPOEUP        "tempoUp"
 
 static pthread_t s_threadId;
 static char replyBuffer[REPLY_BUFFER_SIZE];
@@ -104,9 +107,24 @@ _Bool isUdpThisCommand(char* udpMessage, const char* command)
 }
 
 
-static void processUDPCommand(char* udpCommand, int socketDescriptor, struct sockaddr_in *pSin)
-{
-	//TODO
+static void processUDPCommand(char* udpCommand, int socketDescriptor,
+		struct sockaddr_in *pSin) {
+	replyBuffer[0] = 0;
+	if (isUdpThisCommand(udpCommand, COMMAND_MODEROCK0)) {
+		composer_setwhichBeat(1);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_MODEROCK1)) {
+		composer_setwhichBeat(2);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_MODEROCK2)) {
+		composer_setwhichBeat(3);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_VOLUMEUP)) {
+		joystickControler_setVolume(1);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_VOLUMEDOWN)) {
+		joystickControler_setVolume(0);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_TEMPOEUP)) {
+		joystickControler_setTempo(1);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_TEMPODOWN)) {
+		joystickControler_setTempo(0);
+	}
 }
 
 //static int secondWordToInt(char *string)

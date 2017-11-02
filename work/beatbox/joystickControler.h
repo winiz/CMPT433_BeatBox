@@ -18,6 +18,8 @@
 #define MAX_VOL 100
 
 void joystickControler_init(void);
+void joystickControler_setVolume(_Bool isUP);
+void joystickControler_setTempo(_Bool isLEFT);
 _Bool checkIfPressed(char *fileName);
 void joystickControler_cleanup(void);
 

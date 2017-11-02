@@ -13,14 +13,15 @@
 int main(void) {
 	printf("Beginning play-back \n");
 	AudioMixer_init();
+	UdpListener_startListening();
 	joystickControler_init();
 	composer_init();
-	UdpListener_startListening();
 	
 	
+
+	UdpListener_cleanup();
 	joystickControler_cleanup();
 	composer_cleanup();
-	UdpListener_cleanup();
 	AudioMixer_cleanup();
 	
 	printf("Done!\n");
