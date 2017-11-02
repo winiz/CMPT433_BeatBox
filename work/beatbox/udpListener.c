@@ -22,6 +22,10 @@
 #define COMMAND_VOLUMEUP        "volumeUp"
 #define COMMAND_TEMPODOWN       "tempoDown"
 #define COMMAND_TEMPOEUP        "tempoUp"
+#define COMMAND_BASE            "base"
+#define COMMAND_SNARE           "snare"
+#define COMMAND_HIHAT           "hihat"
+
 
 static pthread_t s_threadId;
 static char replyBuffer[REPLY_BUFFER_SIZE];
@@ -124,8 +128,16 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor,
 		joystickControler_setTempo(1);
 	} else if (isUdpThisCommand(udpCommand, COMMAND_TEMPODOWN)) {
 		joystickControler_setTempo(0);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_BASE)) {
+		composer_queueSound(1);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_SNARE)) {
+		composer_queueSound(2);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_HIHAT)) {
+		composer_queueSound(3);
 	}
+
 }
+
 
 //static int secondWordToInt(char *string)
 //{

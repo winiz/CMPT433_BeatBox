@@ -26,6 +26,15 @@ $(document).ready(function() {
 	$('#tempoUp').click(function(){
 		sendCommand("tempoUp");
 	});
+	$('#base').click(function(){
+		sendCommand("base");
+	});
+	$('#snare').click(function(){
+		sendCommand("snare");
+	});
+	$('#hihat').click(function(){
+		sendCommand("hihat");
+	});
 	
 	socket.on('commandReply', function(result) {
 		$('#volumeid').val(result);

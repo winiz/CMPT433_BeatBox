@@ -72,6 +72,20 @@ void standard_rock_drum_beat(void) {
 	}
 }
 
+void composer_queueSound(int sound){
+	switch (sound) {
+			case 1:
+				AudioMixer_queueSound(&base);
+				break;
+			case 2:
+				AudioMixer_queueSound(&snare);
+				break;
+			case 3:
+				AudioMixer_queueSound(&hihat);
+				break;
+			}
+}
+
 void alternative_drum_beat(void) {
 	// drumbeat idea copied from https://www.musikalessons.com/blog/2016/06/basic-drum-beats-for-rock/
 	for (int i = 0; i < 8; i++) {

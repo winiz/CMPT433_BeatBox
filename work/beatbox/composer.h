@@ -15,6 +15,7 @@ double composer_getTempo(void);
 void composer_setTempo(double newTempo);
 void composer_switchBeat(void);
 void no_drum_beat(void);
+void composer_queueSound(int sound);
 void composer_setwhichBeat(int BeatUwant);
 void standard_rock_drum_beat(void);
 void alternative_drum_beat(void);
