@@ -9,6 +9,7 @@
 #include "composer.h"
 #include "udpListener.h"
 #include "joystickControler.h"
+#include "audioMixer.h"
 
 #define UDP_PORT 12345
 #define MAX_RECEIVE_MESSAGE_LENGTH 1024
@@ -25,6 +26,7 @@
 #define COMMAND_BASE            "base"
 #define COMMAND_SNARE           "snare"
 #define COMMAND_HIHAT           "hihat"
+#define COMMAND_GETVAL          "getval"
 
 
 static pthread_t s_threadId;
@@ -134,10 +136,12 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor,
 		composer_queueSound(2);
 	} else if (isUdpThisCommand(udpCommand, COMMAND_HIHAT)) {
 		composer_queueSound(3);
+	} else if (isUdpThisCommand(udpCommand, COMMAND_GETVAL)) {
+		int volumn_current = AudioMixer_getVolume();
+		sprintf(replyBuffer, "%d", volumn_current);
 	}
 
 }
-
 
 //static int secondWordToInt(char *string)
 //{
@@ -146,7 +150,7 @@ static void processUDPCommand(char* udpCommand, int socketDescriptor,
 //	sscanf(string, "%*s%d", &value);
 //	return value;
 //}
-//
+
 //static void concatValuesToString(char *targetBuffer, int data[], int indexStart, int indexEnd)
 //{
 //	const int TMP_STR_MAX_LEN = 20;

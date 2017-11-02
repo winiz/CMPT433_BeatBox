@@ -4,7 +4,7 @@
 // Make connection to server when web page is fully loaded.
 var socket = io.connect();
 $(document).ready(function() {
-
+	window.setInterval(function() {sendCommand('getval');}, 1000);
 	$('#modeRock0').click(function(){
 		sendCommand("modeRock0");
 	});
