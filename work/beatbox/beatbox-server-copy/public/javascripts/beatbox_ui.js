@@ -28,9 +28,7 @@ $(document).ready(function() {
 	});
 	
 	socket.on('commandReply', function(result) {
-		var newDiv = $('<div></div>').text(result);
-		$('#messages').append(newDiv);
-		$('#messages').scrollTop($('#messages').prop('scrollHeight'));
+		$('#volumeid').val(result);
 	});
 	
 });
