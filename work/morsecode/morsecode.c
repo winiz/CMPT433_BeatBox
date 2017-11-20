@@ -69,6 +69,7 @@ static unsigned short morsecode_codes[] = {
 #define START_CHAR 'A'
 #define END_CHAR   'z'
 #define DATA_SIZE  (END_CHAR - START_CHAR + 1)
+#define ASCII_OFFSET -65;
 static char data[DATA_SIZE];
 
 
@@ -124,7 +125,7 @@ static ssize_t my_write(struct file *file,
 		const char *buff, size_t count, loff_t *ppos)
 {
 	int buff_idx = 0;
-	int temp = -65; 
+	int temp = ASCII_OFFSET; 
 
 	printk(KERN_INFO "demo_miscdrv: In my_write()\n");
 
@@ -136,15 +137,22 @@ static ssize_t my_write(struct file *file,
 			return -EFAULT;
 		}
 
+		if ((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122)){
+			// enforce upper case only
+			if (ch >= 97 && ch <= 122){
+				ch = ch - 32; 			
+			}
+			temp = temp + ch;
+			// Process the character
+			printk(KERN_INFO " is %c (%x), temp is %d \n", ch, morsecode_codes[temp],temp);	
+			temp = ASCII_OFFSET;
+		}
+		
+
 		// Skip special characters:
-		if (ch <= ' ') {
+		else {
 			continue;
 		}
-		temp = temp + ch;
-
-		// Process the character
-		printk(KERN_INFO " is %c (%x), temp is %d \n", ch, morsecode_codes[temp],temp);	
-		temp = 	-65;
 	}
 
 
