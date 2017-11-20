@@ -8,6 +8,7 @@
 #include <linux/fs.h>
 #include <linux/delay.h>
 #include <asm/uaccess.h>
+#include <linux/leds.h>
 
 //#error Are we building this?
 
@@ -72,6 +73,35 @@ static unsigned short morsecode_codes[] = {
 #define ASCII_OFFSET -65;
 static char data[DATA_SIZE];
 
+/******************************************************
+ * LED
+ ******************************************************/
+#include <linux/leds.h>
+
+DEFINE_LED_TRIGGER(ledtrig_demo);
+
+#define LED_ON_TIME_ms 100
+#define LED_OFF_TIME_ms 900
+
+static void my_led_blink(void)
+{
+	led_trigger_event(ledtrig_demo, LED_FULL);
+	msleep(LED_ON_TIME_ms);
+	led_trigger_event(ledtrig_demo, LED_OFF);
+	msleep(LED_OFF_TIME_ms);
+}
+
+static void led_register(void)
+{
+	// Setup the trigger's name:
+	led_trigger_register_simple("morse-code", &ledtrig_demo);
+}
+
+static void led_unregister(void)
+{
+	// Cleanup
+	led_trigger_unregister_simple(ledtrig_demo);
+}
 
 /******************************************************
  * Initialization of Data Function
@@ -137,18 +167,24 @@ static ssize_t my_write(struct file *file,
 			return -EFAULT;
 		}
 
-		if ((ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122)){
+		if (ch == ' ' || (ch >= 65 && ch <= 90) || (ch >= 97 && ch <= 122)){
+
 			// enforce upper case only
 			if (ch >= 97 && ch <= 122){
 				ch = ch - 32; 			
 			}
 			temp = temp + ch;
-			// Process the character
-			printk(KERN_INFO " is %c (%x), temp is %d \n", ch, morsecode_codes[temp],temp);	
-			temp = ASCII_OFFSET;
-		}
-		
 
+			if(ch == ' '){
+				printk(KERN_INFO " is %c \n",95);
+			}
+			else {
+				printk(KERN_INFO " is %c (%x)\n", ch, morsecode_codes[temp]);
+				my_led_blink();
+			}
+			temp = ASCII_OFFSET;
+		
+		}
 		// Skip special characters:
 		else {
 			continue;
@@ -192,6 +228,9 @@ static int __init my_init(void)
 	ret = misc_register(&my_miscdevice);
 
 	initialize_data();
+	
+	// LED:
+	led_register();
 
 	return ret;
 }
@@ -202,6 +241,9 @@ static void __exit my_exit(void)
 
 	// Unregister misc driver
 	misc_deregister(&my_miscdevice);
+	
+	// LED:
+	led_unregister();
 }
 
 module_init(my_init);
