@@ -72,7 +72,20 @@ static unsigned short morsecode_codes[] = {
 #define DATA_SIZE  (END_CHAR - START_CHAR + 1)
 #define ASCII_OFFSET -65;
 #define DEFAULT_DOTTIME 200;
+
 static char data[DATA_SIZE];
+static int dottime = DEFAULT_DOTTIME;
+/******************************************************
+ * Parameter
+ ******************************************************/
+
+// Declare the variable as a parameter.
+//   S_IRUGO makes it's /sys/module node readable.
+//   # cat /sys/module/demo_paramdrv/parameters/myfavnumber
+// Loading:
+//   # modinfo demo_paramdrv.ko
+//   # insmod demo_paramdrv.ko myfavnumber=932
+module_param(dottime, int, S_IRUGO);
 
 /******************************************************
  * LED
@@ -80,7 +93,6 @@ static char data[DATA_SIZE];
 
 
 DEFINE_LED_TRIGGER(ledtrig_demo);
-int dottime = 200;
 
 
 static void led_blink_dot(void){
