@@ -82,8 +82,6 @@ static char data[DATA_SIZE];
 DEFINE_LED_TRIGGER(ledtrig_demo);
 int dottime = 200;
 
-//int offtime_between_letters = dottime;
-//int offtime_between_words = 7 * dottime;
 
 static void led_blink_dot(void){
 	led_trigger_event(ledtrig_demo, LED_FULL);
@@ -209,7 +207,7 @@ static ssize_t my_write(struct file *file,
 		const char *buff, size_t count, loff_t *ppos)
 {
 	int buff_idx = 0;
-	int encoding = ASCII_OFFSET; 
+	int encoding = ASCII_OFFSET;
 
 	printk(KERN_INFO "demo_miscdrv: In my_write()\n");
 
@@ -231,6 +229,8 @@ static ssize_t my_write(struct file *file,
 
 			if(ch == ' '){
 				printk(KERN_INFO "%c ",95);
+				led_trigger_event(ledtrig_demo, LED_OFF);
+				msleep(7*dottime);	
 			}
 			else {
 				printk(KERN_INFO "%c (%x) \n", ch, morsecode_codes[encoding]);
