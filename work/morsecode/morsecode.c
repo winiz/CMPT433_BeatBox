@@ -71,24 +71,77 @@ static unsigned short morsecode_codes[] = {
 #define END_CHAR   'z'
 #define DATA_SIZE  (END_CHAR - START_CHAR + 1)
 #define ASCII_OFFSET -65;
+#define DEFAULT_DOTTIME 200;
 static char data[DATA_SIZE];
 
 /******************************************************
  * LED
  ******************************************************/
-#include <linux/leds.h>
+
 
 DEFINE_LED_TRIGGER(ledtrig_demo);
+int dottime = 200;
 
-#define LED_ON_TIME_ms 100
-#define LED_OFF_TIME_ms 900
+//int offtime_between_letters = dottime;
+//int offtime_between_words = 7 * dottime;
 
-static void my_led_blink(void)
-{
+static void led_blink_dot(void){
 	led_trigger_event(ledtrig_demo, LED_FULL);
-	msleep(LED_ON_TIME_ms);
+	msleep(dottime);
 	led_trigger_event(ledtrig_demo, LED_OFF);
-	msleep(LED_OFF_TIME_ms);
+	msleep(dottime);			
+}
+
+static void led_blink_dash(void){
+	int dashtime = 3 * dottime;
+	led_trigger_event(ledtrig_demo, LED_FULL);
+	msleep(dashtime);
+	led_trigger_event(ledtrig_demo, LED_OFF);
+	msleep(dottime);			
+}
+
+static void my_led_blink(int encoding)
+{	
+	int i;
+	int bites[16];
+	int is_dash_buff[3];
+	int pos_of_buff = 0;
+
+	// is_dash_buff init
+	is_dash_buff[0] = 0;
+	is_dash_buff[1] = 0;
+	is_dash_buff[2] = 0;
+	
+	
+	for (i = 15; i >= 0; i--){
+		bites[i] = (morsecode_codes[encoding] & (1 << i)) >> i;
+		if (bites[i] == 0){
+			if (is_dash_buff[2]==1){
+				led_blink_dash();
+			}
+			else if (is_dash_buff[1]==1){
+				led_blink_dot();
+				led_blink_dot();
+			}
+			else if (is_dash_buff[0]==1){
+				led_blink_dot();
+			}
+
+			//clear is_dash_buff
+			is_dash_buff[0] = 0;
+			is_dash_buff[1] = 0;
+			is_dash_buff[2] = 0;
+			pos_of_buff = 0;
+		}
+		else if (bites[i] == 1){
+			is_dash_buff[pos_of_buff] = 1;
+			pos_of_buff++;		
+		}
+
+		printk(KERN_INFO "test is %x \n", bites[i]);
+	}
+	
+
 }
 
 static void led_register(void)
@@ -102,6 +155,7 @@ static void led_unregister(void)
 	// Cleanup
 	led_trigger_unregister_simple(ledtrig_demo);
 }
+
 
 /******************************************************
  * Initialization of Data Function
@@ -155,7 +209,7 @@ static ssize_t my_write(struct file *file,
 		const char *buff, size_t count, loff_t *ppos)
 {
 	int buff_idx = 0;
-	int temp = ASCII_OFFSET; 
+	int encoding = ASCII_OFFSET; 
 
 	printk(KERN_INFO "demo_miscdrv: In my_write()\n");
 
@@ -173,16 +227,16 @@ static ssize_t my_write(struct file *file,
 			if (ch >= 97 && ch <= 122){
 				ch = ch - 32; 			
 			}
-			temp = temp + ch;
+			encoding = encoding + ch;
 
 			if(ch == ' '){
-				printk(KERN_INFO " is %c \n",95);
+				printk(KERN_INFO "%c ",95);
 			}
 			else {
-				printk(KERN_INFO " is %c (%x)\n", ch, morsecode_codes[temp]);
-				my_led_blink();
+				printk(KERN_INFO "%c (%x) \n", ch, morsecode_codes[encoding]);
+				my_led_blink(encoding);
 			}
-			temp = ASCII_OFFSET;
+			encoding = ASCII_OFFSET;
 		
 		}
 		// Skip special characters:

@@ -1,0 +1,1 @@
+cmd_/home/william/cmpt433/work/morsecode/built-in.o :=  rm -f /home/william/cmpt433/work/morsecode/built-in.o; /home/william/cmpt433/work/bb-kernel/dl/gcc-linaro-5.4.1-2017.05-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-ar rcsD /home/william/cmpt433/work/morsecode/built-in.o
