@@ -9,6 +9,7 @@
 #include <linux/delay.h>
 #include <asm/uaccess.h>
 #include <linux/leds.h>
+#include <linux/kfifo.h>
 
 //#error Are we building this?
 
@@ -75,6 +76,7 @@ static unsigned short morsecode_codes[] = {
 
 static char data[DATA_SIZE];
 static int dottime = DEFAULT_DOTTIME;
+
 /******************************************************
  * Parameter
  ******************************************************/
@@ -87,15 +89,35 @@ static int dottime = DEFAULT_DOTTIME;
 //   # insmod demo_paramdrv.ko myfavnumber=932
 module_param(dottime, int, S_IRUGO);
 
+
+/**************************************************************
+ * FIFO Support
+ *************************************************************/
+// Info on the interface:
+//    https://www.kernel.org/doc/htmldocs/kernel-api/kfifo.html#idp10765104
+// Good example:
+//    http://lxr.free-electrons.com/source/samples/kfifo/bytestream-example.c
+
+#define FIFO_SIZE 256	// Must be a power of 2.
+static DECLARE_KFIFO(dashes_and_dots_fifo, char, FIFO_SIZE);
+
 /******************************************************
  * LED
  ******************************************************/
 
-
 DEFINE_LED_TRIGGER(ledtrig_demo);
 
+static void limit_dottime(void){
+	if(dottime > 2000){
+		dottime = 2000;
+	}
+	else if (dottime < 1){
+		dottime = 1;
+	}
+}
 
 static void led_blink_dot(void){
+	limit_dottime();
 	led_trigger_event(ledtrig_demo, LED_FULL);
 	msleep(dottime);
 	led_trigger_event(ledtrig_demo, LED_OFF);
@@ -148,7 +170,6 @@ static void my_led_blink(int encoding)
 			pos_of_buff++;		
 		}
 
-		printk(KERN_INFO "test is %x \n", bites[i]);
 	}
 	
 
@@ -205,7 +226,6 @@ static ssize_t my_read(struct file *file,
 			return -EFAULT;
 		}
 
-
 		data_idx++;
 		bytes_read++;
 	}
@@ -222,6 +242,9 @@ static ssize_t my_write(struct file *file,
 	int encoding = ASCII_OFFSET;
 
 	printk(KERN_INFO "demo_miscdrv: In my_write()\n");
+
+	//dottime range is [1-2000]
+	limit_dottime();
 
 	// printk the right morsecode_codes[x]
 	for (buff_idx = 0; buff_idx < count; buff_idx++) {
@@ -256,8 +279,6 @@ static ssize_t my_write(struct file *file,
 			continue;
 		}
 	}
-
-
 
 	// Return # bytes actually written.
 	*ppos += count;
@@ -297,6 +318,9 @@ static int __init my_init(void)
 	
 	// LED:
 	led_register();
+	
+	// Initialize the FIFO.
+	INIT_KFIFO(dashes_and_dots_fifo);
 
 	return ret;
 }
