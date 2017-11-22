@@ -244,7 +244,7 @@ static ssize_t my_write(struct file *file,
 	int buff_idx = 0;
 	int encoding = ASCII_OFFSET;
 
-	printk(KERN_INFO "demo_miscdrv: In my_write()\n");
+	//printk(KERN_INFO "demo_miscdrv: In my_write()\n");
 
 	//dottime range is [1-2000]
 	limit_dottime();
@@ -267,11 +267,15 @@ static ssize_t my_write(struct file *file,
 
 			if(ch == ' '){
 				led_trigger_event(ledtrig_demo, LED_OFF);
-				msleep(7*dottime);	
+				msleep(7*dottime);
+				insert_to_queue(' ');
+				insert_to_queue(' ');
+				insert_to_queue(' ');
 			}
 			else {
-				printk(KERN_INFO "%c (%x) \n", ch, morsecode_codes[encoding]);
+				//printk(KERN_INFO "%c (%x) \n", ch, morsecode_codes[encoding]);
 				my_led_blink(encoding);
+				insert_to_queue(' ');
 			}
 			encoding = ASCII_OFFSET;
 		
