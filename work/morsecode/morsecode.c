@@ -107,6 +107,15 @@ static DECLARE_KFIFO(echo_fifo, char, FIFO_SIZE);
 
 DEFINE_LED_TRIGGER(ledtrig_demo);
 
+static int insert_to_queue(char character){
+	if (!kfifo_put(&echo_fifo, character)) {
+		return -EFAULT;
+	}
+	else {
+		return 0;
+	}
+}
+
 static void limit_dottime(void){
 	if(dottime > 2000){
 		dottime = 2000;
@@ -117,6 +126,7 @@ static void limit_dottime(void){
 }
 
 static void led_blink_dot(void){
+	insert_to_queue('.');
 	limit_dottime();
 	led_trigger_event(ledtrig_demo, LED_FULL);
 	msleep(dottime);
@@ -126,15 +136,17 @@ static void led_blink_dot(void){
 
 static void led_blink_dash(void){
 	int dashtime = 3 * dottime;
+	insert_to_queue('-');
 	led_trigger_event(ledtrig_demo, LED_FULL);
 	msleep(dashtime);
 	led_trigger_event(ledtrig_demo, LED_OFF);
 	msleep(dottime);			
 }
 
-static void my_led_blink(int encoding)
+static int my_led_blink(int encoding)
 {	
 	int i;
+	int mode = 3; //mode 3 is initial value
 	int bites[16];
 	int is_dash_buff[3];
 	int pos_of_buff = 0;
@@ -150,13 +162,16 @@ static void my_led_blink(int encoding)
 		if (bites[i] == 0){
 			if (is_dash_buff[2]==1){
 				led_blink_dash();
+				mode = 2;
 			}
 			else if (is_dash_buff[1]==1){
 				led_blink_dot();
 				led_blink_dot();
+				mode = 1;
 			}
 			else if (is_dash_buff[0]==1){
 				led_blink_dot();
+				mode = 0;
 			}
 
 			//clear is_dash_buff
@@ -172,7 +187,7 @@ static void my_led_blink(int encoding)
 
 	}
 	
-
+	return mode;
 }
 
 static void led_register(void)
@@ -226,8 +241,6 @@ static ssize_t my_read(struct file *file,
 static ssize_t my_write(struct file *file,
 		const char *buff, size_t count, loff_t *ppos)
 {	
-	int i;
-	int copied;
 	int buff_idx = 0;
 	int encoding = ASCII_OFFSET;
 
@@ -253,7 +266,6 @@ static ssize_t my_write(struct file *file,
 			encoding = encoding + ch;
 
 			if(ch == ' '){
-				printk(KERN_INFO "%c ",95);
 				led_trigger_event(ledtrig_demo, LED_OFF);
 				msleep(7*dottime);	
 			}
@@ -268,22 +280,9 @@ static ssize_t my_write(struct file *file,
 		else {
 			continue;
 		}
-	}
-	
-// Push data into fifo, one byte at a time (with delays)
-	for (i = 0; i < count; i++) {
-		// Demo how to insert to fifo directly from user-buffer
-		if (kfifo_from_user(&echo_fifo, &buff[i], sizeof(buff[i]), &copied)) {
-			return -EFAULT;
-		}
-
-		// Demo how to insert data from kernel-mode into fifo
-		if (!kfifo_put(&echo_fifo, '_')) {
-			// Fifo full
-			return -EFAULT;
-		}
 		msleep(100);
 	}
+	
 
 	// Return # bytes actually written.
 	*ppos += count;
