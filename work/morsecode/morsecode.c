@@ -99,7 +99,7 @@ module_param(dottime, int, S_IRUGO);
 //    http://lxr.free-electrons.com/source/samples/kfifo/bytestream-example.c
 
 #define FIFO_SIZE 256	// Must be a power of 2.
-static DECLARE_KFIFO(dashes_and_dots_fifo, char, FIFO_SIZE);
+static DECLARE_KFIFO(echo_fifo, char, FIFO_SIZE);
 
 /******************************************************
  * LED
@@ -205,39 +205,29 @@ static void initialize_data(void)
 static ssize_t my_read(struct file *file,
 		char *buff, size_t count, loff_t *ppos)
 {
-	int buffer_idx = 0;
-	int data_idx = (int) *ppos;
-	int bytes_read = 0;
-
-	printk(KERN_INFO "demo_miscdrv::my_read(), buff size %d, f_pos %d\n",
-			(int) count, (int) *ppos);
-
-	// Fill buffer 1 byte at a time
-	for (buffer_idx = 0; buffer_idx < count; buffer_idx++) {
-
-		if (data_idx >= DATA_SIZE) {
-			break;
-		}
-
-		// Copy next byte of data into user's buffer.
-		// copy_to_user returns 0 for success (# of bytes not copied)
-		if (copy_to_user(&buff[buffer_idx], &data[data_idx], 1)) {
-			printk(KERN_ERR "Unable to write to buffer.");
-			return -EFAULT;
-		}
-
-		data_idx++;
-		bytes_read++;
+	// Pull all available data from fifo into user buffer
+	int num_bytes_read = 0;
+	if (kfifo_to_user(&echo_fifo, buff, count, &num_bytes_read)) {
+		return -EFAULT;
 	}
 
-	// Write to in/out parameters and return:
-	*ppos = data_idx;
-	return bytes_read;  // # bytes actually read.
+	// Can use kfifo_get() to pull out a single value to kernel:
+	/*
+	int val;
+	if (!kfifo_get(&echo_fifo, &val)) {
+		// fifo empty.... handle it some how
+	}
+	// now data is in val... do with it what you will.
+	*/
+
+	return num_bytes_read;  // # bytes actually read.
 }
 
 static ssize_t my_write(struct file *file,
 		const char *buff, size_t count, loff_t *ppos)
-{
+{	
+	int i;
+	int copied;
 	int buff_idx = 0;
 	int encoding = ASCII_OFFSET;
 
@@ -278,6 +268,21 @@ static ssize_t my_write(struct file *file,
 		else {
 			continue;
 		}
+	}
+	
+// Push data into fifo, one byte at a time (with delays)
+	for (i = 0; i < count; i++) {
+		// Demo how to insert to fifo directly from user-buffer
+		if (kfifo_from_user(&echo_fifo, &buff[i], sizeof(buff[i]), &copied)) {
+			return -EFAULT;
+		}
+
+		// Demo how to insert data from kernel-mode into fifo
+		if (!kfifo_put(&echo_fifo, '_')) {
+			// Fifo full
+			return -EFAULT;
+		}
+		msleep(100);
 	}
 
 	// Return # bytes actually written.
@@ -320,7 +325,7 @@ static int __init my_init(void)
 	led_register();
 	
 	// Initialize the FIFO.
-	INIT_KFIFO(dashes_and_dots_fifo);
+	INIT_KFIFO(echo_fifo);
 
 	return ret;
 }
